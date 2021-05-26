@@ -1,20 +1,17 @@
 package com.ontology.generator.api;
 
-import com.ontology.generator.services.GraphDBService;
-import com.ontology.generator.services.HttpClientService;
-import org.apache.catalina.connector.Response;
+import com.ontology.generator.service.GeneratorService;
+import com.ontology.generator.service.GraphDBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
-
-import javax.websocket.server.PathParam;
-import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/generator")
 public class GeneratorApi {
     @Autowired
-    private GraphDBService graphDBService;
+    private GeneratorService generatorService;
 
     @GetMapping("/hello")
     public String hello() {
@@ -27,9 +24,11 @@ public class GeneratorApi {
     }
 
     @GetMapping("/getRequests")
-    public ResponseEntity<Object> getRequests() {
-        ArrayList<Object> result = new ArrayList<>();
-        String strRes = graphDBService.sendRequest();
-        return ResponseEntity.ok(strRes);
+    public ResponseEntity<Object> getRequests(@Nullable @RequestParam("classFilter") String classFilter) {
+        if (classFilter != null && !classFilter.isBlank()) {
+            return ResponseEntity.ok(generatorService.getRequests());
+        } else {
+            return ResponseEntity.ok(generatorService.getRequests(classFilter));
+        }
     }
 }
