@@ -29,13 +29,14 @@ public class GraphDBService {
     private String GRAPHDB_SERVER;
     @Value("${graph.db.repository.id}")
     private String REPOSITORY_ID;
+    @Value("${graph.db.base.class}")
+    private String BASE_CLASS;
 
-    private String strInsert;
-    private String strQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+    private String strPrefixes = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
             "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
-            "PREFIX :<http://www.semanticweb.org/krysanovs/ontologies/2018/5/gazpromneft_demo#> " +
-            "select * " +
-            "where { ?s rdf:type :LaborContract. } limit 100";
+            "PREFIX :<http://www.semanticweb.org/krysanovs/ontologies/2018/5/gazpromneft_demo#> ";
+    private String strQuery = "select * " +
+            "where { ?s rdf:type :classFilter. } limit 100";
 
     private RepositoryConnection getRepositoryConnection() {
         Repository repository = new HTTPRepository(GRAPHDB_SERVER, REPOSITORY_ID);
@@ -45,35 +46,17 @@ public class GraphDBService {
         return repositoryConnection;
     }
 
-//    private void insert(
-//            RepositoryConnection repositoryConnection) {
-//
-//        repositoryConnection.begin();
-//        Update updateOperation = repositoryConnection
-//                .prepareUpdate(QueryLanguage.SPARQL, strInsert);
-//        updateOperation.execute();
-//
-//        try {
-//            repositoryConnection.commit();
-//        } catch (Exception e) {
-//            if (repositoryConnection.isActive())
-//                repositoryConnection.rollback();
-//        }
-//    }
-
     private String query(
             RepositoryConnection repositoryConnection) {
         TupleQuery tupleQuery = repositoryConnection
                 .prepareTupleQuery(QueryLanguage.SPARQL, strQuery);
         TupleQueryResult result = null;
+        String strRes = "";
         try {
             result = tupleQuery.evaluate();
             while (result.hasNext()) {
                 BindingSet bindingSet = result.next();
-
-                SimpleLiteral name =
-                        (SimpleLiteral)bindingSet.getValue("name");
-                logger.trace("name = " + name.stringValue());
+                strRes += bindingSet.toString() + "\n";
             }
         }
         catch (QueryEvaluationException qee) {
@@ -82,7 +65,7 @@ public class GraphDBService {
             return qee.toString();
         } finally {
             result.close();
-            return result.toString();
+            return strRes;
         }
     }
 
