@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 @Service
 public class GraphDBService {
@@ -47,7 +47,11 @@ public class GraphDBService {
     }
 
     public String replaceBaseClassInRequest(String request) {
-        return request.replace(":placeForBaseClass", BASE_CLASS);
+        return request.replace("_placeForBaseClass_", BASE_CLASS);
+    }
+
+    public String replaceBaseClassInRequest(String request, String placeName) {
+        return request.replace(placeName, BASE_CLASS);
     }
 
     private RepositoryConnection getRepositoryConnection() {

@@ -1,11 +1,13 @@
 package com.ontology.generator.api;
 
 import com.ontology.generator.service.GeneratorService;
-import com.ontology.generator.service.GraphDBService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
+
+import javax.websocket.server.PathParam;
 
 @RestController
 @RequestMapping("/api/generator")
@@ -24,11 +26,12 @@ public class GeneratorApi {
     }
 
     @GetMapping("/getRequests")
-    public ResponseEntity<Object> getRequests(@Nullable @RequestParam("classFilter") String classFilter) {
-        if (classFilter != null && !classFilter.isBlank()) {
-            return ResponseEntity.ok(generatorService.getRequests());
-        } else {
-            return ResponseEntity.ok(generatorService.getRequests(classFilter));
-        }
+    public ResponseEntity<Object> getRequests() {
+        return ResponseEntity.ok(generatorService.getRequests());
+    }
+
+    @GetMapping("/getRequestsByClass")
+    public ResponseEntity<Object> getRequests(@NonNull @RequestParam("classFilter") String classFilter) {
+        return ResponseEntity.ok(generatorService.getRequests(classFilter));
     }
 }
