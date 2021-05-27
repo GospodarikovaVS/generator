@@ -9,9 +9,11 @@ public enum SparqlQuery {
             "PREFIX :<http://www.semanticweb.org/krysanovs/ontologies/2018/5/gazpromneft_demo#> "),
 
     GET_ALL_CLASSES(1L, (REQUEST_PREFIXES.getQuery() +
-            "select * where {  ?o rdfs:subClassOf :_placeForBaseClass_. } ")),
+            "select * where {  ?o rdfs:subClassOf :_placeForBaseClass_ . } ")),
     GET_CONCRETE_CLASS_ENTITIES(2L, (REQUEST_PREFIXES.getQuery() +
-            "select * where {  ?o rdf:type :_className_. } "));
+            "select * where {  ?o rdf:type :_className_ . } ")),
+    GET_ALL_POSSIBLE_PREDICATES(3L, REQUEST_PREFIXES.getQuery() +
+            "select distinct ?p where { ?s ?p ?o . ?s rdf:type :_className_ . filter(?p != rdf:type)}");
 
     private static final Map<Long, SparqlQuery> identityMap = new HashMap<>();
 

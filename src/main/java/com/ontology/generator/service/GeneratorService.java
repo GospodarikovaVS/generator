@@ -36,8 +36,11 @@ public class GeneratorService {
         ArrayList<BindingSet> set = getEntitiesByClass(classFilter);
         set.forEach(s -> result.put(s.getValue("o").stringValue(), new ArrayList<>()));
         //get all predicates
-
+        ArrayList<String> predicates = getAllPossiblePredicatesByClass(classFilter);
         //get request for every entity
+        result.forEach((obj, reqs) -> {
+            reqs.addAll(getRequestsForEntity(obj, predicates));
+        });
 
         return result;
     }
@@ -61,5 +64,19 @@ public class GeneratorService {
     private ArrayList<BindingSet> getEntitiesByClass(String className) {
         return graphDBService.sendRequest(SparqlQuery.GET_CONCRETE_CLASS_ENTITIES.getQuery()
                 .replace("_className_", className));
+    }
+
+    private ArrayList<String> getAllPossiblePredicatesByClass(String className) {
+        ArrayList<String> predicates = new ArrayList<>();
+        graphDBService.sendRequest(SparqlQuery.GET_ALL_POSSIBLE_PREDICATES.getQuery()
+                .replace("_className_", className))
+                .forEach(b -> predicates.add(b.getValue("p").stringValue()));
+        return predicates;
+    }
+
+    private ArrayList<String> getRequestsForEntity(String entity, ArrayList<String> predicates) {
+        ArrayList<String> requests = new ArrayList<>();
+        requests.add("REQUEST");
+        return requests;
     }
 }
